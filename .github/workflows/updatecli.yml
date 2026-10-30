@@ -1,41 +1,127 @@
 ---
-name: "Updatecli: Dependency Management"
+name: Bump documentation version on new release
 
 on:
   workflow_dispatch:
   schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  updatecli:
+  admission-controller-docs-update:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 20.x
+          persist-credentials: false
 
-      #  https://github.com/actions/setup-node/issues/490
-      - name: Repair NPM  # Update to latest npm and yarn
-        run: "npm install -g npm yarn"
+      - name: Install Updatecli
+        uses: updatecli/updatecli-action@5d180ff09f5204e599bbd6030cd1736009ed5ff2 # v3.9.0
 
-      - name: Install Dependencies
-        run: "yarn install --frozen-lockfile"
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: generate-token
+        with:
+          app-id: ${{ secrets.APP_ID }} # zizmor: ignore[secrets-outside-env]
+          private-key: ${{ secrets.APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
+          owner: ${{ github.repository_owner }} # the default
+          repositories: ${{ github.event.repository.name }}
+          # minimum permissions for updatecli to push a branch and open a PR
+          permission-contents: write
+          permission-pull-requests: write
 
-      - name: Install Updatecli Binary
-        uses: updatecli/updatecli-action@v2
-
-      - name: Run Updatecli in enforce mode
-        run: "updatecli compose apply --experimental"
+      - name: Promote docs version and update CLI reference paths
+        run: "updatecli compose apply --file updatecli/bump-documentation-version.yaml"
         env:
           GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+  sbomscanner-docs-update:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Updatecli
+        uses: updatecli/updatecli-action@5d180ff09f5204e599bbd6030cd1736009ed5ff2 # v3.9.0
+
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: generate-token
+        with:
+          app-id: ${{ secrets.APP_ID }} # zizmor: ignore[secrets-outside-env]
+          private-key: ${{ secrets.APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
+          owner: ${{ github.repository_owner }} # the default
+          repositories: ${{ github.event.repository.name }}
+          # minimum permissions for updatecli to push a branch and open a PR
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Promote docs version and update CLI reference paths
+        run: "updatecli compose apply --file updatecli/sbomscanner-bump-documentation-version.yaml"
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+  runtime-enforcer-docs-update:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Updatecli
+        uses: updatecli/updatecli-action@5d180ff09f5204e599bbd6030cd1736009ed5ff2 # v3.9.0
+
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: generate-token
+        with:
+          app-id: ${{ secrets.APP_ID }} # zizmor: ignore[secrets-outside-env]
+          private-key: ${{ secrets.APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
+          owner: ${{ github.repository_owner }} # the default
+          repositories: ${{ github.event.repository.name }}
+          # minimum permissions for updatecli to push a branch and open a PR
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Promote docs version and update CRD and CLI reference paths
+        run: "updatecli compose apply --file updatecli/runtime-enforcer-bump-documentation-version.yaml"
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+  network-enforcer-docs-update:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Updatecli
+        uses: updatecli/updatecli-action@5d180ff09f5204e599bbd6030cd1736009ed5ff2 # v3.9.0
+
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: generate-token
+        with:
+          app-id: ${{ secrets.APP_ID }} # zizmor: ignore[secrets-outside-env]
+          private-key: ${{ secrets.APP_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
+          owner: ${{ github.repository_owner }} # the default
+          repositories: ${{ github.event.repository.name }}
+          # minimum permissions for updatecli to push a branch and open a PR
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Promote docs version and update CRD reference paths
+        run: "updatecli compose apply --file updatecli/network-enforcer-bump-documentation-version.yaml"
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}

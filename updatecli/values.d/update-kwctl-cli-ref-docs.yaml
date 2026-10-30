@@ -1,0 +1,11 @@
+---
+# Values.yaml contains settings that be used from Updatecli manifest.
+scm:
+  enabled: false
+
+files:
+  - src: "crates/kwctl/cli-docs.adoc"
+    dst: docs/admission-controller/version-1.39/modules/en/partials/kwctl-cli-reference.adoc
+src:
+  branch: "main"
+  url: "https://github.com/kubewarden/adm-controller.git"

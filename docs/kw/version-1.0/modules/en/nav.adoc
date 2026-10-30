@@ -1,0 +1,2 @@
+include::partial$variables.adoc[]
+include::partial${build-type}-specific/landing-nav.adoc[]

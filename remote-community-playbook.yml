@@ -1,0 +1,52 @@
+---
+site:
+  url: https://docs.kubewarden.io
+  title: Kubewarden
+  start_page: 1.0@kubewarden:en:introduction.adoc
+
+content:
+  sources:
+    - url: https://github.com/kubewarden/docs.git
+      branches: [main]
+      start_paths: [
+        shared,
+        docs/kw/version-*,
+        docs/admission-controller/version-*,
+        docs/sbom-scanner/version-*,
+        docs/runtime-enforcer/version-*,
+        docs/network-enforcer/version-*
+        ]
+
+ui:
+  bundle:
+    url: ./ui/ui-bundle.zip
+    snapshot: true
+  supplemental_files: ./kw-community-docs-supp-files
+
+asciidoc:
+  attributes:
+    kw-build-community: true
+    build-type: community
+    # Log a warning for every reference to an undefined attribute.
+    attribute-missing: warn
+    ga-build: true  # Use google analytics.
+    page-pagination: ''
+    tabs-sync-option: ''
+  extensions:
+    - '@asciidoctor/tabs'
+    - ./docs-common/extensions/mermaid-block/mermaid-block.js
+
+antora:
+  extensions:
+    # - require: "@antora/pdf-extension"
+    - require: "@antora/lunr-extension"
+      index_latest_only: true
+    - require: ./docs-common/extensions/dynamic-loading-attributes/load-global-site-attributes.js
+      attributefile: ./docs-common/global-attributes.yml
+      enabled: true
+    - require: ./docs-common/extensions/versions-latest-prerelease/vlp.js
+      enabled: true
+
+
+output:
+  dir: build/site
